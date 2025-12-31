@@ -29,3 +29,10 @@ def GameView():
 
 When you use @dataclass, Python generates an `__init__` that sets all the fields. `__post_init__` runs right after that, so you can add initialization logic.
 In your code:
+
+
+## Art
+
+* [Pepper&Carrot](https://opengameart.org/content/24x32-peppercarrot-characters)
+  * [Pepper & Carrot site](https://www.peppercarrot.com/en/)
+  * other [24x32 sets](https://opengameart.org/art-search-advanced?field_art_tags_tid=24x32)

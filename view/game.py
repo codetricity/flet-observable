@@ -25,10 +25,15 @@ def GameView():
     def on_right_click(e):
         state.set_direction("right")
     
+    def on_down_click(e):
+        state.set_direction("down")
+    
     # Get current frame based on state
     frames = {
         "right": ["assets/right_1.png", "assets/right_2.png", "assets/right_3.png"],
         "left": ["assets/left_1.png", "assets/left_2.png", "assets/left_3.png"],
+        "down": ["assets/down_1.png", "assets/down_2.png", "assets/down_3.png"],
+
     }
     current_frame_idx = state.current_frame[state.direction]
     current_frame_path = frames[state.direction][current_frame_idx]
@@ -50,10 +55,11 @@ def GameView():
                 controls=[
                     ft.Button("left", on_click=on_left_click),
                     ft.Button("right", on_click=on_right_click),
+                    ft.Button("down", on_click=on_down_click)
                 ]
             ),
             ft.Stack(
-                controls=[sprite],
+                controls=[ft.Image(src="background.jpg"), sprite],
                 width=800,
                 height=600,
             ),

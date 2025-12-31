@@ -6,7 +6,7 @@ import flet as ft
 class GameState:
     direction: str = "right"
     sprite_x: int = 5
-    sprite_y: int = 0
+    sprite_y: int = 300
     current_frame: dict[str, int] = None
 
     # from dataclass.  runs after initialization
