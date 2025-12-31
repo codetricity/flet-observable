@@ -4,6 +4,8 @@ theme: default
 paginate: true
 ---
 
+
+
 # Python and Flet Concepts for Beginners
 
 ## Pepper Tutorial
@@ -12,6 +14,11 @@ paginate: true
 - Reactive programming concepts
 - Flet's declarative UI approach
 - MVC architecture
+
+---
+
+Concept inspired by Pepper&Carrot by David Revoy
+![pepper tutorial](assets/Enchanted-Pages_by-David-Revoy.jpg)
 
 ---
 
@@ -42,6 +49,10 @@ class GameState:
 - The `@ft.observable` decorator makes the class reactive
 - When you change `state.direction`, the UI automatically re-renders
 - No manual UI updates such as `page.update()` needded
+
+---
+
+![sprites](assets/sprites.png)
 
 ---
 
