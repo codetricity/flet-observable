@@ -744,3 +744,123 @@ def GameView():
 - Build your own reactive components
 
 **Have fun!**
+
+---
+
+# Python Concepts: Dictionary Unpacking with `**`
+
+## The Double Asterisk (`**`) Operator
+
+The `**` operator in Python is used for **dictionary unpacking** (also called dictionary spreading).
+
+---
+
+## Dictionary Unpacking: Basic Example
+
+```python
+original = {"a": 1, "b": 2, "c": 3}
+new_dict = {**original, "d": 4}
+
+# Result: {"a": 1, "b": 2, "c": 3, "d": 4}
+```
+
+**What happens:**
+
+- `**original` unpacks all key-value pairs from `original`
+- The new dictionary includes all original pairs plus the new `"d": 4` pair
+
+---
+
+## Dictionary Unpacking: Updating Values
+
+```python
+original = {"a": 1, "b": 2, "c": 3}
+updated = {**original, "b": 99}
+
+# Result: {"a": 1, "b": 99, "c": 3}
+```
+
+**Key Point:**
+
+- If a key already exists, the new value **overwrites** the old one
+- This creates a **new dictionary** (doesn't modify the original)
+
+---
+
+## Dictionary Unpacking: In Your Code
+
+From `movement.py`:
+
+```python
+state.current_frame = {**state.current_frame, "down": (current + 1) % len(right_frames)}
+```
+
+**What this does:**
+
+1. Unpacks all existing key-value pairs from `state.current_frame`
+2. Updates the `"down"` key with a new frame index
+3. Creates a new dictionary and assigns it back to `state.current_frame`
+
+---
+
+**Why this pattern?**
+
+- Creates a new dictionary object (important for observables!)
+- Preserves all other direction frame indices
+- Only updates the specific direction being animated
+
+---
+
+## Dictionary Unpacking: Multiple Dictionaries
+
+```python
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+combined = {**dict1, **dict2}
+
+# Result: {"a": 1, "b": 2, "c": 3, "d": 4}
+```
+
+**Note:**
+
+- Later dictionaries override earlier ones if keys overlap
+- `{**dict1, **dict2, "e": 5}` combines all three sources
+
+---
+
+## Why Not Direct Assignment?
+
+**Why not do this?**
+
+```python
+state.current_frame["down"] = (current + 1) % len(right_frames)
+```
+
+---
+
+**Answer:**
+
+- Direct assignment modifies the existing dictionary object
+- With Flet observables, creating a **new dictionary** ensures the change is detected
+- The observable system can track that `current_frame` now points to a different object
+
+---
+
+## Dictionary Unpacking: Summary
+
+**Key Concepts:**
+
+- `**dict` unpacks a dictionary into key-value pairs
+- `{**dict1, **dict2}` merges dictionaries
+- `{**dict, "key": value}` creates a new dict with updated/added key
+- Creates new objects (important for reactive frameworks!)
+- Later values override earlier ones when keys conflict
+
+---
+
+## Dictionary Unpacking Common Use Cases
+
+- Immutable updates (creating new dicts instead of modifying)
+- Merging multiple dictionaries
+- Updating specific keys while preserving others
+- Working with reactive/observable state management
