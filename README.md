@@ -11,6 +11,11 @@ Code for tutorial on using Flet 1.0 for animation games.
 1. [Flet 1.0 Python for Beginners Course Overview (Learn Python by Building Games) -  Pepper 1](https://youtu.be/F2f98GhkKUA)
 2. [Flet 1.0 Reactive State Management in Python - Pepper 2](https://youtu.be/e0krw8TrGII)
 
+
+[Course slides](docs/slides.md)
+
+Note that the slides are using [Marp](https://marp.app/).
+
 ## Setup
 
 This project uses `uv` for dependency management. To set up the project:
