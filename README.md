@@ -1,5 +1,27 @@
 # flet animation demo with observable
 
+Code for tutorial on using Flet 1.0 for animation games.
+
+![screenshot](docs/assets/screenshot.png)
+
+## Setup
+
+This project uses `uv` for dependency management. To set up the project:
+
+```bash
+uv sync
+```
+
+This will install all dependencies defined in `pyproject.toml`.
+
+## Running
+
+To run the application:
+
+```bash
+flet main.py
+```
+
 ## observable
 
 ft.observable is a Flet decorator that makes a class reactive, so UI components automatically re-render when its properties change.
@@ -25,11 +47,11 @@ def GameView():
 
 `__post_init__` is a special method in Python dataclasses that runs automatically after the dataclass-generated `__init__` completes.
 
-### How it works
+### How post_init works
 
 When you use @dataclass, Python generates an `__init__` that sets all the fields. `__post_init__` runs right after that, so you can add initialization logic.
-In your code:
 
+In your code:
 
 ## Art
 
