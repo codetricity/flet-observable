@@ -48,7 +48,7 @@ class GameState:
 
 - The `@ft.observable` decorator makes the class reactive
 - When you change `state.direction`, the UI automatically re-renders
-- No manual UI updates such as `page.update()` needded
+- No manual UI updates such as `page.update()` needed
 
 ---
 
@@ -102,7 +102,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
 ---
 
-## Flet Observable (mutable) vs Riverpod (immutable) 
+## Flet Observable (mutable) vs Riverpod (immutable)
 
 **Flet (Mutable):**
 
@@ -256,6 +256,238 @@ def GameView():
 - **Only the component** using `use_state` re-renders when state changes
 - The second return value (setter) is optional if you modify the state object directly
 - State is **local to the component** unless you pass it as props
+
+---
+
+# `ft.use_state`: Return Values
+
+## Understanding the Tuple Return
+
+```python
+state, set_state = ft.use_state(GameState())
+```
+
+**Two return values:**
+
+1. **State object**: The current state instance
+2. **Setter function**: Optional function to replace the entire state
+
+---
+
+# `ft.use_state`: Using the Setter
+
+## When to Use the Setter
+
+```python
+@ft.component
+def Counter():
+    count, set_count = ft.use_state(0)
+    
+    def increment(e):
+        set_count(count + 1)  # Replace entire state
+    
+    def increment_direct(e):
+        count += 1  # Won't work! Can't modify immutable types
+    
+    return ft.Button(f"Count: {count}", on_click=increment)
+```
+
+**Key Points:**
+
+- Use setter for **immutable types** (int, str, tuple)
+- For **mutable objects** (observable classes), modify directly
+- Setter creates a **new state**, triggering re-render
+
+---
+
+# `ft.use_state`: Mutable vs Immutable State
+
+## Mutable Objects (Observable Classes)
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())  # Setter not needed
+    
+    def move_left(e):
+        state.sprite_x -= 10  # Direct mutation works!
+        # Observable detects change automatically
+    
+    return ft.Button("Left", on_click=move_left)
+```
+
+**Why this works:**
+
+- Observable classes detect property changes
+- No setter needed for observable state objects
+- Direct mutation triggers re-render
+
+---
+
+# `ft.use_state`: Mutable vs Immutable State
+
+## Immutable Types (Primitives)
+
+```python
+@ft.component
+def Counter():
+    count, set_count = ft.use_state(0)  # Setter required
+    
+    def increment(e):
+        set_count(count + 1)  # Must use setter
+    
+    return ft.Button(f"Count: {count}", on_click=increment)
+```
+
+**Why setter is needed:**
+
+- Primitive types (int, str) are immutable
+- Can't modify them directly
+- Setter creates new value, triggering re-render
+
+---
+
+# `ft.use_state`: Multiple State Variables
+
+## Managing Multiple Pieces of State
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())
+    count, set_count = ft.use_state(0)
+    is_paused, set_paused = ft.use_state(False)
+    
+    def toggle_pause(e):
+        set_paused(not is_paused)
+    
+    return ft.Column(
+        controls=[
+            ft.Text(f"Score: {count}"),
+            ft.Button("Pause" if not is_paused else "Resume", 
+                     on_click=toggle_pause)
+        ]
+    )
+```
+
+**Best Practice:**
+
+- Use separate `use_state` calls for unrelated state
+- Group related state in a single observable class
+
+---
+
+# `ft.use_state`: State Initialization
+
+## Lazy Initialization
+
+```python
+@ft.component
+def ExpensiveView():
+    # This runs on EVERY render (bad!)
+    state, _ = ft.use_state(expensive_computation())
+    
+    return ft.Column(...)
+```
+
+**Problem:**
+
+- Initial value is computed on every render
+- Can cause performance issues
+
+---
+
+# `ft.use_state`: State Initialization
+
+## Lazy Initialization with Function
+
+```python
+@ft.component
+def ExpensiveView():
+    # This runs only ONCE (good!)
+    state, _ = ft.use_state(lambda: expensive_computation())
+    
+    return ft.Column(...)
+```
+
+**Solution:**
+
+- Pass a **function** instead of a value
+- Function is called only once on first render
+- Useful for expensive initializations
+
+---
+
+# `ft.use_state`: Common Pitfalls
+
+## Pitfall 1: Modifying State in Render
+
+```python
+@ft.component
+def BadExample():
+    count, set_count = ft.use_state(0)
+    
+    # BAD: Modifying state during render
+    count += 1  # Causes infinite loop!
+    
+    return ft.Text(f"Count: {count}")
+```
+
+**Why it's bad:**
+
+- Component re-renders when state changes
+- Re-render modifies state again
+- Creates infinite loop
+
+---
+
+# `ft.use_state`: Common Pitfalls
+
+## Pitfall 2: Not Using Observable for Complex State
+
+```python
+@ft.component
+def BadExample():
+    # BAD: Using dict/list without observable
+    data, set_data = ft.use_state({"x": 0, "y": 0})
+    
+    def move(e):
+        data["x"] += 10  # Change not detected!
+        set_data(data)  # Must replace entire dict
+    
+    return ft.Button("Move", on_click=move)
+```
+
+**Better approach:**
+
+```python
+@dataclass
+@ft.observable
+class Position:
+    x: int = 0
+    y: int = 0
+
+@ft.component
+def GoodExample():
+    pos, _ = ft.use_state(Position())
+    
+    def move(e):
+        pos.x += 10  # Change detected automatically!
+    
+    return ft.Button("Move", on_click=move)
+```
+
+---
+
+# `ft.use_state`: Best Practices
+
+## Summary
+
+1. **Use observable classes** for complex state (objects with multiple properties)
+2. **Use setter** for primitive types (int, str, bool)
+3. **Pass function** for expensive initializations
+4. **Never modify state** during render
+5. **Keep state local** unless you need to share it
 
 ---
 
@@ -486,6 +718,456 @@ ft.use_effect(update, None)
 
 ---
 
+# `ft.use_effect`: Cleanup Functions
+
+## Cleaning Up Resources
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())
+    
+    def start_animation():
+        running = True
+        
+        async def tick():
+            while running:
+                await asyncio.sleep(0.2)
+                update_sprite(state)
+        
+        task = ft.context.page.run_task(tick)
+        
+        # Cleanup function - runs when component unmounts
+        def cleanup():
+            nonlocal running
+            running = False
+            task.cancel()
+        
+        return cleanup
+    
+    ft.use_effect(start_animation, [])
+    
+    return ft.Column(...)
+```
+
+**Key Points:**
+
+- Return a cleanup function from the effect
+- Cleanup runs when component unmounts or dependencies change
+- Essential for stopping animations, canceling requests, etc.
+
+---
+
+# `ft.use_effect`: Multiple Effects
+
+## Using Multiple Effects
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())
+    
+    # Effect 1: Start animation loop
+    def start_animation():
+        async def tick():
+            while True:
+                await asyncio.sleep(0.2)
+                update_sprite(state)
+        return ft.context.page.run_task(tick)
+    
+    # Effect 2: Load resources on mount
+    def load_resources():
+        # Load sprite images, etc.
+        pass
+    
+    # Effect 3: Save state when it changes
+    def save_state():
+        # Save to localStorage, etc.
+        pass
+    
+    ft.use_effect(start_animation, [])
+    ft.use_effect(load_resources, [])
+    ft.use_effect(save_state, [state.sprite_x, state.sprite_y])
+    
+    return ft.Column(...)
+```
+
+**Best Practice:**
+
+- Use separate effects for different concerns
+- Each effect has its own dependencies and cleanup
+
+---
+
+# `ft.use_effect`: Conditional Effects
+
+## Running Effects Conditionally
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())
+    is_paused, set_paused = ft.use_state(False)
+    
+    def start_animation():
+        if is_paused:
+            return  # Don't start if paused
+        
+        async def tick():
+            while not is_paused:
+                await asyncio.sleep(0.2)
+                update_sprite(state)
+        
+        return ft.context.page.run_task(tick)
+    
+    # Effect re-runs when is_paused changes
+    ft.use_effect(start_animation, [is_paused])
+    
+    return ft.Column(...)
+```
+
+**Key Points:**
+
+- Effect function can check conditions
+- Dependencies control when effect runs
+- Cleanup stops previous effect when dependencies change
+
+---
+
+# `ft.use_effect`: Common Patterns
+
+## Pattern 1: Data Fetching
+
+```python
+@ft.component
+def UserProfile():
+    user, set_user = ft.use_state(None)
+    loading, set_loading = ft.use_state(True)
+    
+    def fetch_user():
+        async def load():
+            set_loading(True)
+            data = await fetch_user_data()
+            set_user(data)
+            set_loading(False)
+        
+        return ft.context.page.run_task(load)
+    
+    ft.use_effect(fetch_user, [])
+    
+    if loading:
+        return ft.ProgressRing()
+    
+    return ft.Text(f"Hello, {user.name}")
+```
+
+---
+
+# `ft.use_effect`: Common Patterns
+
+## Pattern 2: Subscriptions
+
+```python
+@ft.component
+def LiveData():
+    data, set_data = ft.use_state([])
+    
+    def subscribe():
+        def on_update(new_data):
+            set_data(new_data)
+        
+        subscription = data_stream.subscribe(on_update)
+        
+        # Cleanup: unsubscribe when component unmounts
+        def cleanup():
+            subscription.unsubscribe()
+        
+        return cleanup
+    
+    ft.use_effect(subscribe, [])
+    
+    return ft.Column(controls=[ft.Text(str(item)) for item in data])
+```
+
+---
+
+# `ft.use_effect`: Common Pitfalls
+
+## Pitfall 1: Missing Dependencies
+
+```python
+@ft.component
+def BadExample():
+    count, set_count = ft.use_state(0)
+    multiplier, set_multiplier = ft.use_state(2)
+    
+    def calculate():
+        # BAD: Uses 'multiplier' but not in dependencies
+        result = count * multiplier
+        # This won't update when multiplier changes!
+    
+    ft.use_effect(calculate, [count])  # Missing multiplier!
+    
+    return ft.Text(f"Result: {result}")
+```
+
+**Fix:**
+
+```python
+ft.use_effect(calculate, [count, multiplier])  # Include all dependencies
+```
+
+---
+
+# `ft.use_effect`: Common Pitfalls
+
+## Pitfall 2: Infinite Loops
+
+```python
+@ft.component
+def BadExample():
+    count, set_count = ft.use_state(0)
+    
+    def increment():
+        # BAD: Modifies state that effect depends on
+        set_count(count + 1)
+    
+    # Effect runs -> modifies count -> effect runs again -> infinite loop!
+    ft.use_effect(increment, [count])
+    
+    return ft.Text(f"Count: {count}")
+```
+
+**Fix:**
+
+- Don't modify dependencies inside the effect
+- Or use a different dependency that doesn't change
+
+---
+
+# `ft.use_effect`: Best Practices
+
+## Summary
+
+1. **Always include dependencies** that the effect uses
+2. **Return cleanup functions** for resources (animations, subscriptions)
+3. **Use empty array `[]`** for one-time setup (mount/unmount)
+4. **Don't modify dependencies** inside the effect (causes loops)
+5. **Separate concerns** into multiple effects
+
+---
+
+# `ft.context.page.run_task`: Running Async Code
+
+## What is `run_task`?
+
+- `run_task` schedules an async function to run in Flet's event loop
+- Required for running async code in Flet components
+- Returns a task that can be canceled
+
+---
+
+# `ft.context.page.run_task`: Basic Usage
+
+## Simple Example
+
+```python
+@ft.component
+def AsyncExample():
+    result, set_result = ft.use_state("Loading...")
+    
+    def fetch_data():
+        async def load():
+            await asyncio.sleep(1)  # Simulate API call
+            set_result("Data loaded!")
+        
+        # Schedule async function to run
+        return ft.context.page.run_task(load)
+    
+    ft.use_effect(fetch_data, [])
+    
+    return ft.Text(result)
+```
+
+**Key Points:**
+
+- Must use `run_task` to run async code in Flet
+- Returns immediately (doesn't block)
+- Task runs in background
+
+---
+
+# `ft.context.page.run_task`: In Animation Loops
+
+## Animation Loop Pattern
+
+```python
+@ft.component
+def GameView():
+    state, _ = ft.use_state(GameState())
+    
+    def start_animation():
+        running = True
+        
+        async def tick():
+            while running:
+                await asyncio.sleep(0.2)  # Frame delay
+                update_sprite(state)  # Update state
+        
+        # Start the animation loop
+        task = ft.context.page.run_task(tick)
+        
+        # Cleanup: stop animation
+        def cleanup():
+            nonlocal running
+            running = False
+            task.cancel()  # Cancel the task
+        
+        return cleanup
+    
+    ft.use_effect(start_animation, [])
+    
+    return ft.Column(...)
+```
+
+**Why this pattern:**
+
+- Animation needs to run continuously
+- `run_task` schedules it in event loop
+- Cleanup cancels task when component unmounts
+
+---
+
+# `ft.context.page.run_task`: Task Cancellation
+
+## Canceling Tasks
+
+```python
+@ft.component
+def CancellableTask():
+    status, set_status = ft.use_state("Running")
+    
+    def start_task():
+        async def long_running():
+            try:
+                for i in range(100):
+                    await asyncio.sleep(0.1)
+                    set_status(f"Progress: {i}%")
+            except asyncio.CancelledError:
+                set_status("Cancelled")
+        
+        task = ft.context.page.run_task(long_running)
+        
+        def cleanup():
+            task.cancel()  # Cancel when component unmounts
+        
+        return cleanup
+    
+    ft.use_effect(start_task, [])
+    
+    return ft.Text(status)
+```
+
+**Key Points:**
+
+- Call `task.cancel()` to stop a running task
+- Task receives `CancelledError` exception
+- Always cancel tasks in cleanup to prevent leaks
+
+---
+
+# `ft.context.page.run_task`: Multiple Tasks
+
+## Managing Multiple Tasks
+
+```python
+@ft.component
+def MultipleTasks():
+    state, _ = ft.use_state(GameState())
+    
+    def start_tasks():
+        tasks = []
+        
+        # Task 1: Animation loop
+        async def animate():
+            while True:
+                await asyncio.sleep(0.2)
+                update_sprite(state)
+        
+        # Task 2: Background processing
+        async def process():
+            while True:
+                await asyncio.sleep(1.0)
+                process_data(state)
+        
+        tasks.append(ft.context.page.run_task(animate))
+        tasks.append(ft.context.page.run_task(process))
+        
+        def cleanup():
+            for task in tasks:
+                task.cancel()
+        
+        return cleanup
+    
+    ft.use_effect(start_tasks, [])
+    
+    return ft.Column(...)
+```
+
+**Best Practice:**
+
+- Keep track of all tasks
+- Cancel all tasks in cleanup function
+
+---
+
+# `ft.context.page.run_task`: Error Handling
+
+## Handling Errors in Tasks
+
+```python
+@ft.component
+def ErrorHandling():
+    error, set_error = ft.use_state(None)
+    
+    def risky_task():
+        async def run():
+            try:
+                # Some operation that might fail
+                await risky_operation()
+            except Exception as e:
+                set_error(f"Error: {e}")
+        
+        return ft.context.page.run_task(run)
+    
+    ft.use_effect(risky_task, [])
+    
+    if error:
+        return ft.Text(error, color="red")
+    
+    return ft.Text("Running...")
+```
+
+**Key Points:**
+
+- Always handle exceptions in async tasks
+- Unhandled exceptions can crash the app
+- Update state to show errors to user
+
+---
+
+# `ft.context.page.run_task`: Best Practices
+
+## Summary
+
+1. **Always use `run_task`** for async code in Flet components
+2. **Cancel tasks** in cleanup functions to prevent leaks
+3. **Handle errors** in async functions
+4. **Use flags** (like `running`) to control loops
+5. **Track multiple tasks** if you need to cancel them all
+
+---
+
 # MVC Architecture: Model-View-Controller
 
 **MVC** separates your application into three parts:
@@ -535,7 +1217,6 @@ class GameState:
 ```
 
 ---
-
 
 **Model Responsibility:**
 
@@ -591,7 +1272,6 @@ def update_sprite(state: GameState) -> None:
 ```
 
 ---
-
 
 **Controller Responsibility:**
 
