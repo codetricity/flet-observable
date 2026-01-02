@@ -292,6 +292,8 @@ def Counter():
     return ft.Button(f"Count: {count}", on_click=increment)
 ```
 
+---
+
 **Key Points:**
 
 - Use setter for **immutable types** (int, str, tuple)
@@ -316,6 +318,8 @@ def GameView():
     return ft.Button("Left", on_click=move_left)
 ```
 
+---
+
 **Why this works:**
 
 - Observable classes detect property changes
@@ -339,6 +343,8 @@ def Counter():
     return ft.Button(f"Count: {count}", on_click=increment)
 ```
 
+---
+
 **Why setter is needed:**
 
 - Primitive types (int, str) are immutable
@@ -347,7 +353,6 @@ def Counter():
 
 ---
 
-# `ft.use_state`: Multiple State Variables
 
 ## Managing Multiple Pieces of State
 
@@ -369,6 +374,8 @@ def GameView():
         ]
     )
 ```
+
+---
 
 **Best Practice:**
 
@@ -433,6 +440,8 @@ def BadExample():
     return ft.Text(f"Count: {count}")
 ```
 
+---
+
 **Why it's bad:**
 
 - Component re-renders when state changes
@@ -457,6 +466,9 @@ def BadExample():
     
     return ft.Button("Move", on_click=move)
 ```
+
+---
+
 
 **Better approach:**
 
@@ -720,7 +732,6 @@ ft.use_effect(update, None)
 
 # `ft.use_effect`: Cleanup Functions
 
-## Cleaning Up Resources
 
 ```python
 @ft.component
@@ -736,7 +747,12 @@ def GameView():
                 update_sprite(state)
         
         task = ft.context.page.run_task(tick)
-        
+```
+
+---
+
+
+```python
         # Cleanup function - runs when component unmounts
         def cleanup():
             nonlocal running
@@ -758,8 +774,6 @@ def GameView():
 
 ---
 
-# `ft.use_effect`: Multiple Effects
-
 ## Using Multiple Effects
 
 ```python
@@ -779,6 +793,11 @@ def GameView():
     def load_resources():
         # Load sprite images, etc.
         pass
+```
+
+---
+
+```python
     
     # Effect 3: Save state when it changes
     def save_state():
@@ -798,8 +817,6 @@ def GameView():
 - Each effect has its own dependencies and cleanup
 
 ---
-
-# `ft.use_effect`: Conditional Effects
 
 ## Running Effects Conditionally
 
@@ -826,6 +843,8 @@ def GameView():
     return ft.Column(...)
 ```
 
+---
+
 **Key Points:**
 
 - Effect function can check conditions
@@ -834,7 +853,6 @@ def GameView():
 
 ---
 
-# `ft.use_effect`: Common Patterns
 
 ## Pattern 1: Data Fetching
 
@@ -863,7 +881,6 @@ def UserProfile():
 
 ---
 
-# `ft.use_effect`: Common Patterns
 
 ## Pattern 2: Subscriptions
 
@@ -875,13 +892,11 @@ def LiveData():
     def subscribe():
         def on_update(new_data):
             set_data(new_data)
-        
         subscription = data_stream.subscribe(on_update)
         
         # Cleanup: unsubscribe when component unmounts
         def cleanup():
             subscription.unsubscribe()
-        
         return cleanup
     
     ft.use_effect(subscribe, [])
@@ -911,6 +926,9 @@ def BadExample():
     return ft.Text(f"Result: {result}")
 ```
 
+---
+
+
 **Fix:**
 
 ```python
@@ -937,6 +955,9 @@ def BadExample():
     
     return ft.Text(f"Count: {count}")
 ```
+
+---
+
 
 **Fix:**
 
@@ -983,11 +1004,12 @@ def AsyncExample():
         
         # Schedule async function to run
         return ft.context.page.run_task(load)
-    
     ft.use_effect(fetch_data, [])
     
     return ft.Text(result)
 ```
+
+---
 
 **Key Points:**
 
@@ -997,7 +1019,6 @@ def AsyncExample():
 
 ---
 
-# `ft.context.page.run_task`: In Animation Loops
 
 ## Animation Loop Pattern
 
@@ -1016,7 +1037,13 @@ def GameView():
         
         # Start the animation loop
         task = ft.context.page.run_task(tick)
-        
+
+```
+
+---
+
+```python
+
         # Cleanup: stop animation
         def cleanup():
             nonlocal running
@@ -1029,6 +1056,9 @@ def GameView():
     
     return ft.Column(...)
 ```
+
+---
+
 
 **Why this pattern:**
 
@@ -1055,7 +1085,11 @@ def CancellableTask():
                     set_status(f"Progress: {i}%")
             except asyncio.CancelledError:
                 set_status("Cancelled")
-        
+```
+
+---
+
+```python
         task = ft.context.page.run_task(long_running)
         
         def cleanup():
@@ -1093,7 +1127,11 @@ def MultipleTasks():
             while True:
                 await asyncio.sleep(0.2)
                 update_sprite(state)
-        
+```
+
+---
+
+```python
         # Task 2: Background processing
         async def process():
             while True:
@@ -1113,6 +1151,9 @@ def MultipleTasks():
     
     return ft.Column(...)
 ```
+
+---
+
 
 **Best Practice:**
 
@@ -1139,6 +1180,11 @@ def ErrorHandling():
                 set_error(f"Error: {e}")
         
         return ft.context.page.run_task(run)
+```
+
+---
+
+```python
     
     ft.use_effect(risky_task, [])
     
