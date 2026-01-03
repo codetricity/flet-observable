@@ -81,6 +81,8 @@ Start a new Flet 1.0 Python project and begin coding your game world.
 - Adjust flet window width
 - Flet Stack for layers and pixel positioning
 
+---
+
 ## [4 Python + Flet 1.0 Game Dev: Layered Backgrounds, Sprites, and Observable Game State](https://youtu.be/AyS3HWiEalE)
 
 Building a simple 2D game with Python and Flet 1.0 by placing a character sprite on top of a background using layered rendering.
@@ -109,8 +111,85 @@ In the next video, we'll slow down and explain the architecture in more detail u
 
 This series is beginner-friendly and focuses on learning Python through practical, visual game development concepts.
 
+---
+
 ## [Python + Flet State Management Explained: useState, Observable Classes, and Game Animation - 5](https://youtu.be/RyUpdMONqN0)
+
+Lecture on state in the Flet game we're building with Python.
+
+How ft.use_state works in Flet, how it compares to React's useState, and why observable Python classes are often the better choice for complex, mutable game state such as character movement and animation.
+
+Topics covered in this lesson include:
+
+- What ft.use_state returns (state + optional setter)
+- Why the setter can be ignored when using observable objects
+- Managing game state with a Python @dataclass
+- How ft.observable enables direct mutation with automatic re-rendering
+- When to use setters vs. observable classes
+- Immutable vs. mutable state in Flet
+- Preventing unnecessary re-renders and infinite render loops
+- Structuring state for performance and scalability
+- Using use_effect for animations and one-time setup
+- Dependency arrays and when effects re-run
+
+Explain game-related data such as sprite position, direction, and animation frame belong in a single observable state object, and how changing any of those values automatically updates only the affected UI component—not the entire screen.
+
+This video is conceptual and architectural, helping you build an understanding of how Flet's reactive model works. In the next lesson, we apply these ideas directly by adding animation and continuing to move Pepper across the screen.
+
+This tutorial is part of a beginner-friendly Python + Flet series, with a focus on clean architecture, performance, and learning transferable UI state management concepts.
 
 ## [Python + Flet 1.0 Game Animation: Sprite Frames, Direction State, and Walking Animations - 6](https://youtu.be/dKS-Nhf6OoY)
 
-## [Python + Flet 1.0: Add Direction Buttons (Up/Down/Left/Right) with State-Driven Re-Renders - 7](https://youtu.be/Vi7LwQJiZG8)
+Add character animation to our Python + Flet game by introducing directional sprite frames and cycling through them over time.
+
+Up to this point, our character could move across the screen in a single direction using position updates. Now, we extend the game state to support animation by tracking both direction and current animation frame, and we wire everything together so the sprite visually "walks" as it moves.
+
+What you'll learn in this lesson:
+
+- Extending the game state with direction and current_frame
+- Using a Python @dataclass with **post_init** to initialize animation state
+
+- Representing animation frames as lists of image paths
+- Tracking animation state with a dictionary keyed by direction
+- Cycling frames using the Python modulo operator
+- Updating sprite frames on a timed loop
+- Separating logic using a simple MVC-style structure
+- Model: game state (GameState)
+- View: Flet UI and sprite rendering
+- Control: movement and animation logic
+- Using dictionary unpacking to update frame state cleanly
+- Swapping image sources dynamically inside a Flet Image component
+
+Build the animation system so it scales naturally to all four directions (left, right, up, down), even though this video focuses on moving to the right. Each direction uses the same looping logic—only the frame list changes.
+
+By the end of the video, Pepper walks smoothly across the screen using a three-frame animation loop, and the infrastructure is in place to add directional input next.
+
+In the next lesson, we'll introduce Flet buttons to control movement direction and connect user input directly to game state updates.
+
+This tutorial is part of a beginner-friendly Python + Flet game development series, with a strong emphasis on clean architecture, state-driven UI updates, and reusable animation logic.
+
+---
+
+## [7 Python + Flet 1.0: Add Direction Buttons (Up/Down/Left/Right) with State-Driven Re-Renders](https://youtu.be/Vi7LwQJiZG8)
+
+In this tutorial, we take our Flet 1.0 game from a sprite that only moves in one direction to a fully controllable character with four-direction movement using Flet buttons.
+
+We start with Pepper walking to the right, then add a simple button UI (Left, Right, Up, Down). Each button click updates the game state, which triggers a reactive screen re-render—so the sprite changes direction and animation frames immediately based on state changes.
+
+What you'll build and learn:
+
+- Create Flet buttons and wire them to click handlers
+- Replace a single Stack return with a Column layout (UI + game view)
+- Add a button row and align controls cleanly in the UI
+- Extend animation support from "right only" to all four directions
+- Add frame lists for left/up/down and switch frame sets based on direction
+- Update sprite X/Y bounds correctly for each direction (screen limits)
+- Demonstrate how changing state drives re-rendering in a declarative UI
+
+Architecture focus (MVC):
+
+- Model: GameState stores direction, sprite position, and current animation frame
+- View: the Flet UI (buttons + sprite + background) displays state
+- Controller: movement logic updates the model based on user input
+
+By the end of the video, you'll have a working directional controller where button clicks flow through the controller, update the model, and automatically re-render the view—setting you up to add more game mechanics, more characters, and more complex interactions.
