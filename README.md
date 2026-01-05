@@ -12,9 +12,9 @@ Code for tutorial on using Flet 1.0 for animation games.
 2. [Flet 1.0 Reactive State Management in Python - Pepper 2](https://youtu.be/e0krw8TrGII)
 3. [Start Flet 1.0 Game With Background Graphics](https://youtu.be/hdQhcMid5D4)
 4. [Python + Flet 1.0 Game Dev: Layered Backgrounds, Sprites, and Observable Game State](https://youtu.be/AyS3HWiEalE)
-5. [Python + Flet State Management Explained: useState, Observable Classes, and Game Animation](https://youtu.be/RyUpdMONqN0) - Available Jan 5, 2026
-6. [Python + Flet 1.0 Game Animation: Sprite Frames, Direction State, and Walking Animations](https://youtu.be/dKS-Nhf6OoY) - Available Jan 6, 2026
-7. [Python + Flet 1.0: Add Direction Buttons (Up/Down/Left/Right) with State-Driven Re-Renders](https://youtu.be/Vi7LwQJiZG8) - Available Jan 7, 2026
+5. [Python + Flet State Management Explained: useState, Observable Classes, and Game Animation](https://youtu.be/RyUpdMONqN0)
+6. [Python + Flet 1.0 Game Animation: Sprite Frames, Direction State, and Walking Animations](https://youtu.be/dKS-Nhf6OoY)
+7. [Python + Flet 1.0: Add Direction Buttons (Up/Down/Left/Right) with State-Driven Re-Renders](https://youtu.be/Vi7LwQJiZG8) - Available Jan 6, 2026
 
 [Course slides](docs/slides.md)
 
